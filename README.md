@@ -3,9 +3,9 @@ Here is the <strong><big>PyTorch implementation</big></strong> of the paper.
 ## Update progress
 1/6/2025 - TCFNet is now publicly available!
 ## Requirments
-conda create -n pointcept python=3.8 -y
+conda create -n point python=3.8 -y
 
-conda activate pointcept
+conda activate point
 
 conda install ninja -y
 
