@@ -1,4 +1,4 @@
-# TCFNet: Bidirectional Face-bone Transformation by a Transformer-based Coarse-to-ﬁne Point Moving Network
+# TCFNet: Bidirectional Face-Bone Transformation via a Transformer-Based Coarse-to-Fine Point Movement Network
 Here is the <strong><big>PyTorch implementation</big></strong> of the paper.
 ## Update progress
 1/6/2025 - TCFNet is now publicly available!
