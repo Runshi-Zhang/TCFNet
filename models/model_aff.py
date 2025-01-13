@@ -2,9 +2,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-class GeoConv(nn.Module):
+class relativeposition(nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels, norm='bn'):
-        super(GeoConv, self).__init__()
+        super(relativeposition, self).__init__()
         self.lin1 = nn.Linear(in_channels, out_channels)
         self.lin2 = nn.Linear(hidden_channels, out_channels)
         self.lins = nn.ModuleList([nn.Linear(in_channels, hidden_channels) for _ in range(6)])
@@ -37,9 +37,9 @@ class GeoConv(nn.Module):
 
         return y
 
-class PointPlus(nn.Module):  # PointNet++
+class edgeConv(nn.Module):  # PointNet++
     def __init__(self, in_channels, out_channels, first_layer=False):
-        super(PointPlus, self).__init__()
+        super(edgeConv, self).__init__()
         self.first_layer = first_layer
         self.fc1 = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, 1),
