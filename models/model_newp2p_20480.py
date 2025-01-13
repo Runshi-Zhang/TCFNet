@@ -129,7 +129,7 @@ class LIANet(nn.Module):
             nn.Conv1d(128, 64, 1),
         )
 
-        self.seg_head = nn.Sequential(
+        self.mlp = nn.Sequential(
             nn.Conv1d(80, 64, 1),
             nn.BatchNorm1d(64),
             nn.LeakyReLU(negative_slope=0.2),
@@ -208,7 +208,7 @@ class LIANet(nn.Module):
                                                            device=device) * 1e-2)
         l0_points = self.feat_conv(torch.cat((l0_points3, l0_points4, l0_points1), dim=1))
         feat2 = self.GRU(l0_points, feat)
-        l0_points = self.seg_head(torch.cat((feat2, noise_points), dim=1))
+        l0_points = self.mlp(torch.cat((feat2, noise_points), dim=1))
         return torch.add(l0_points, point_cloud), l0_points
 
 
@@ -224,7 +224,7 @@ class PPNet_after_cov(nn.Module):
         self.noise_dim = noise_dim
         self.noise_stdv = noise_stdv
 
-        self.seg_head = (
+        self.mlp = (
             nn.Sequential(
                 nn.Linear(80, 64),
                 PointBatchNorm(64),
@@ -271,7 +271,7 @@ class PPNet_after_cov(nn.Module):
         data_dict = self.displace(data_dict)['feat']
         noise_points = torch.normal(mean=0, std=torch.ones((b * n, 16),
                                                            device=device) * 1e-2)
-        feat = self.seg_head(torch.cat([data_dict, noise_points], -1))
+        feat = self.mlp(torch.cat([data_dict, noise_points], -1))
         feat = feat.view(-1, 20480, 3)
         displacement = feat.permute(0, 2, 1).contiguous()
         point_cloud1 = torch.add(displacement, point_cloud[:, 0:3, :])
