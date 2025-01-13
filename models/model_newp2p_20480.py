@@ -113,9 +113,9 @@ class GRU(nn.Module):
         h_hat = self.conv_h(torch.cat([cur_x, r * prev_s], 1))
         h = (1 - z) * cur_x + z * h_hat
         return h
-class PPNet_GNN_brach_noise_unit(nn.Module):
+class LIANet(nn.Module):
     def __init__(self, if_noise=True, noise_dim=3, noise_stdv=1e-2):
-        super(PPNet_GNN_brach_noise_unit, self).__init__()
+        super(LIANet, self).__init__()
         self.feat_conv = nn.Sequential(
             nn.Conv1d(640, 512, 1),
             nn.BatchNorm1d(512),
@@ -237,7 +237,7 @@ class PPNet_after_cov(nn.Module):
         )
 
         self.displace = PointTransformerV3(in_channels=6)
-        self.stepconv = PPNet_GNN_brach_noise_unit()
+        self.stepconv = LIANet()
 
 
     def forward(self, point_cloud):
