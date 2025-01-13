@@ -6,7 +6,7 @@ from models.utils import Conv1d
 
 from models.model_v3 import PointTransformerV3
 
-from models.model_aff import GeoConv,  PointPlus
+from models.model_aff import relativeposition,  edgeConv
 
 
 
@@ -151,11 +151,11 @@ class LIANet(nn.Module):
             nn.BatchNorm1d(128),
             nn.LeakyReLU(negative_slope=0.2),
         )
-        self.GNN1 = GeoConv(in_channels=64, hidden_channels=64, out_channels=128)
-        self.GNN2 = GeoConv(in_channels=128, hidden_channels=64, out_channels=256)
+        self.GNN1 = relativeposition(in_channels=64, hidden_channels=64, out_channels=128)
+        self.GNN2 = relativeposition(in_channels=128, hidden_channels=64, out_channels=256)
         self.GRU = GRU(in_channel=64)
-        self.pointplus1 = PointPlus(in_channels=64, out_channels=128)
-        self.pointplus2 = PointPlus(in_channels=128, out_channels=256)
+        self.edgeConv1 = edgeConv(in_channels=64, out_channels=128)
+        self.edgeConv2 = edgeConv(in_channels=128, out_channels=256)
 
     def forward(self, point_cloud, feat):
         """
@@ -178,8 +178,8 @@ class LIANet(nn.Module):
         l0_points_raw = torch.cat([point_cloud, covariances, noise_points], dim=1)  # (B, 12, N)
         l0_points_raw = self.conv1(l0_points_raw)  # (B, 64, N)
         l0_points_raw = torch.flatten(l0_points_raw.transpose(1, 2), start_dim=0, end_dim=1)
-        l0_points1 = self.pointplus1(l0_points_raw, b, n, sid, tid)
-        l0_points1 = self.pointplus2(l0_points1, b, n, sid, tid)
+        l0_points1 = self.edgeConv1(l0_points_raw, b, n, sid, tid)
+        l0_points1 = self.edgeConv2(l0_points1, b, n, sid, tid)
         l0_points1 = l0_points1.view(b, n, -1).transpose(1,2)
 
         max_valid_neighbors = 8#8
