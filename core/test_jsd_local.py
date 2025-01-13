@@ -8,7 +8,7 @@ import MPED
 
 from jsd import jsd_between_point_cloud_sets
 
-from models.model_newp2p_20480 import P2PNet as Model
+from models.model_newp2p_20480 import TFCNet as Model
 from Chamfer3D.dist_chamfer_3D import chamfer_3DDist
 from datasets import datasets
 import glob
