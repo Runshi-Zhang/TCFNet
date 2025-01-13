@@ -167,6 +167,7 @@ class LIANet(nn.Module):
         b, n, _ = point_cloud.shape
         point_cloud = point_cloud.transpose(1, 2)
 
+        #local covariance matrix
         knn_idx, sid, tid, distance = knn_gnn(point_cloud, k=8)#8
         knn_x = index_points(point_cloud.permute(0, 2, 1), knn_idx)  # (B, N, 16, 3)
         mean = torch.mean(knn_x, dim=2, keepdim=True)
@@ -174,14 +175,16 @@ class LIANet(nn.Module):
         covariances = torch.matmul(knn_x.transpose(2, 3), knn_x).view(b, n, -1).permute(0, 2, 1)
         noise_points = torch.normal(mean=0, std=torch.ones((b, 3, n),
                                                            device=device) * 1e-2)
-
         l0_points_raw = torch.cat([point_cloud, covariances, noise_points], dim=1)  # (B, 12, N)
         l0_points_raw = self.conv1(l0_points_raw)  # (B, 64, N)
         l0_points_raw = torch.flatten(l0_points_raw.transpose(1, 2), start_dim=0, end_dim=1)
+
+        #EdgeConv
         l0_points1 = self.edgeConv1(l0_points_raw, b, n, sid, tid)
         l0_points1 = self.edgeConv2(l0_points1, b, n, sid, tid)
         l0_points1 = l0_points1.view(b, n, -1).transpose(1,2)
 
+        #relative position
         max_valid_neighbors = 8#8
         dis, sid = distance.topk(max_valid_neighbors, largest=False)  # [B, n, max_valid_neighbors]#这里计算的是最远距离
         sid += torch.arange(b, device=device, dtype=sid.dtype).view(b, 1, 1) * n
