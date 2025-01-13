@@ -89,9 +89,9 @@ def index_points(point_clouds, index):
     new_points = point_clouds[batch_indices, index, :]
     return new_points
 
-class Unit(nn.Module):
+class GRU(nn.Module):
     def __init__(self, in_channel=256):
-        super(Unit, self).__init__()
+        super(GRU, self).__init__()
 
         self.conv_z = Conv1d(in_channel * 2, in_channel, if_bn=True, activation_fn=torch.sigmoid)
         self.conv_r = Conv1d(in_channel * 2, in_channel, if_bn=True, activation_fn=torch.sigmoid)
@@ -153,7 +153,7 @@ class PPNet_GNN_brach_noise_unit(nn.Module):
         )
         self.GNN1 = GeoConv(in_channels=64, hidden_channels=64, out_channels=128)
         self.GNN2 = GeoConv(in_channels=128, hidden_channels=64, out_channels=256)
-        self.unit = Unit(in_channel=64)
+        self.GRU = GRU(in_channel=64)
         self.pointplus1 = PointPlus(in_channels=64, out_channels=128)
         self.pointplus2 = PointPlus(in_channels=128, out_channels=256)
 
@@ -207,7 +207,7 @@ class PPNet_GNN_brach_noise_unit(nn.Module):
         noise_points = torch.normal(mean=0, std=torch.ones((b, 16, n),
                                                            device=device) * 1e-2)
         l0_points = self.feat_conv(torch.cat((l0_points3, l0_points4, l0_points1), dim=1))
-        feat2 = self.unit(l0_points, feat)
+        feat2 = self.GRU(l0_points, feat)
         l0_points = self.seg_head(torch.cat((feat2, noise_points), dim=1))
         return torch.add(l0_points, point_cloud), l0_points
 
@@ -280,9 +280,9 @@ class PPNet_after_cov(nn.Module):
 
         return point_cloud1, point_cloud
 
-class P2PNet(nn.Module):
+class TFCNet(nn.Module):
     def __init__(self):
-        super(P2PNet, self).__init__()
+        super(TFCNet, self).__init__()
         self.pp_moduleA = PPNet_after_cov()
         self.pp_moduleB = PPNet_after_cov()
 
