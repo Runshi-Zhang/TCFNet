@@ -18,7 +18,7 @@ from time import time
 from tensorboardX import SummaryWriter
 
 from utils.average_meter import AverageMeter
-from models.model_newp2p_20480 import P2PNet as Model
+from models.model_newp2p_20480 import TFCNet as Model
 from Chamfer3D.dist_chamfer_3D import chamfer_3DDist
 from datasets import datasets
 import glob
